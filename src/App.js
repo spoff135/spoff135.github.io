@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Bike Stem Setup Comparator</h1>
+      <h1>Bike Stem/Handlebar Setup Comparator</h1>
       <div className="app-container">
         <BikeForm onUpdate={handleUpdate} />
         <BikePlot geometry={bikeGeometry} />

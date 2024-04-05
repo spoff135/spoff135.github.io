@@ -1,40 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import handlebarOptions from './handlebarConfig';
 
 const BikeForm = ({ onUpdate }) => {
-
   const [formValues, setFormValues] = useState({
     setup1: {
-      headTubeAngle: 73, // Default values for setup 1
+      headTubeAngle: 73,
       stemLength: 100,
       stemAngle: 6,
       stemSpacerHeight: 0,
-      handlebarRise: 30,
+      handlebarRise: 0,
+      handlebarRiseAngle: 0,   
+      handlebar: "No rise",
     },
     setup2: {
-      headTubeAngle: 73, // Default values for setup 2
+      headTubeAngle: 73,
       stemLength: 100,
       stemAngle: 6,
       stemSpacerHeight: 0,
-      handlebarRise: 30,
+      handlebarRise: 0,
+      handlebarRiseAngle: 0,      
+      handlebar: "No rise",
     }
   });
 
   const handleChange = (e, setup) => {
     const { name, value } = e.target;
-    // Immediately update the parent component's state with the new formValues
+    
     setFormValues(prevValues => {
-      const updatedValues = {
-        ...prevValues,
-        [setup]: {
+      let updatedSetup;
+      if (name === "handlebar") {
+        // When handlebar changes, spread the selected option config and explicitly set the handlebar
+        const selectedOptionConfig = handlebarOptions[value];
+        updatedSetup = {
           ...prevValues[setup],
-          [name]: parseFloat(value) || 0, // Ensure NaN is not set; fallback to 0 if parseFloat fails
-        },
+          ...selectedOptionConfig,
+          handlebar: value, // Ensure handlebar value is explicitly updated
+        };
+      } else {
+        // Handle updates for all other inputs
+        const isNumberInput = e.target.type === 'number';
+        updatedSetup = {
+          ...prevValues[setup],
+          [name]: isNumberInput ? parseFloat(value) || 0 : value,
+        };
+      }
+  
+      const newValues = {
+        ...prevValues,
+        [setup]: updatedSetup,
       };
-      // Call onUpdate here to immediately reflect changes
-      onUpdate(updatedValues);
-      return updatedValues;
+      
+      // Assuming onUpdate should be called with the latest values
+      // It's placed here to use the most up-to-date state
+      onUpdate(newValues);
+  
+      return newValues;
     });
-  };
+  };  
 
   return (
     <div className="bike-form">    
@@ -71,6 +93,21 @@ const BikeForm = ({ onUpdate }) => {
               <input type="number" name="handlebarRise" value={formValues.setup1.handlebarRise} onChange={(e) => handleChange(e, 'setup1')} />
             </label>
           </div>
+          <div>
+            <label>
+              Handlebar:
+              <select
+                name="handlebar"
+                value={formValues.setup1.handlebar}
+                onChange={(e) => handleChange(e, 'setup1')}
+              >
+                <option value="No rise">No rise</option>
+                <option value="Kitchen Sink Handlebar">Kitchen Sink Handlebar</option>
+                <option value="Top Shelf Handlebar 50mm Rise">Top Shelf Handlebar 50mm Rise</option>
+                <option value="Top Shelf Handlebar 70mm Rise">Top Shelf Handlebar 70mm Rise</option>
+              </select>
+            </label>
+          </div>
         </div>
         
         <div style={{ color: 'red' }}>
@@ -105,6 +142,21 @@ const BikeForm = ({ onUpdate }) => {
               <input type="number" name="handlebarRise" value={formValues.setup2.handlebarRise} onChange={(e) => handleChange(e, 'setup2')} />
             </label>
           </div>
+          <div>
+            <label>
+              Handlebar:
+              <select
+                name="handlebar"
+                value={formValues.setup2.handlebar}
+                onChange={(e) => handleChange(e, 'setup2')}
+              >
+                <option value="No rise">No rise</option>
+                <option value="Kitchen Sink Handlebar">Kitchen Sink Handlebar</option>
+                <option value="Top Shelf Handlebar 50mm Rise">Top Shelf Handlebar 50mm Rise</option>
+                <option value="Top Shelf Handlebar 70mm Rise">Top Shelf Handlebar 70mm Rise</option>
+              </select>
+            </label>
+          </div>
         </div>
       </form>
     </div>
@@ -112,6 +164,3 @@ const BikeForm = ({ onUpdate }) => {
 };
 
 export default BikeForm;
-
-/*          <BikePlot geometry={formValues} onUpdateEnds={handlePlotUpdates} />
-*/

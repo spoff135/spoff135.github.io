@@ -17,7 +17,7 @@ const BikePlot = ({ geometry }) => {
 
       // Function to draw a setup
       const drawSetup = (setup, color) => {
-        const { headTubeAngle, stemLength, stemAngle, stemSpacerHeight, handlebarRise } = setup;
+        const { headTubeAngle, stemLength, stemAngle, stemSpacerHeight, handlebarRise, handlebarRiseAngle } = setup;
 
         // Convert angle from degrees to radians for trig functions
         const headTubeAngleRad = headTubeAngle * (Math.PI / 180);
@@ -35,6 +35,9 @@ const BikePlot = ({ geometry }) => {
 
         const stemEndX = stemStartX + stemLength * Math.cos(-stemAngleRad);
         const stemEndY = stemStartY + stemLength * Math.sin(-stemAngleRad);        
+
+        const hbarEndX = stemEndX - handlebarRise * Math.sin(handlebarRiseAngle * (Math.PI / 180));;
+        const hbarEndY = stemEndY - handlebarRise * Math.cos(handlebarRiseAngle * (Math.PI / 180));
 
         // Draw head tube
         svg.append("line")
@@ -54,8 +57,17 @@ const BikePlot = ({ geometry }) => {
           .attr("stroke", color)
           .attr("stroke-width", 2);
         
-          // Add a border
-          svg.append("rect")
+        // Draw handlebar
+        svg.append("line") // Example of drawing the head tube
+          .attr("x1", stemEndX)
+          .attr("y1", stemEndY)
+          .attr("x2", hbarEndX) // Simplified example; adjust with actual calculations
+          .attr("y2", hbarEndY)
+          .attr("stroke", color)
+          .attr("stroke-width", 2);
+
+        // Add a border
+        svg.append("rect")
           .attr("x", 0)
           .attr("y", 0)
           .attr("width", width)
@@ -65,7 +77,7 @@ const BikePlot = ({ geometry }) => {
           .attr("stroke-width", 2); // Border width
 
         // Add more elements based on your calculations
-        return { stemEndX, stemEndY };
+        return { hbarEndX, hbarEndY };
       }
       // Draw both setups with different colors
       const endsSetup1 = drawSetup(setup1, "blue");
@@ -74,25 +86,25 @@ const BikePlot = ({ geometry }) => {
       drawSetup(setup2, "red");
 
       // Calculate the differences
-      const riseDifference = endsSetup1.stemEndY - endsSetup2.stemEndY;
-      const reachDifference = endsSetup1.stemEndX - endsSetup2.stemEndX;
+      const riseDifference = endsSetup1.hbarEndY - endsSetup2.hbarEndY;
+      const reachDifference = endsSetup1.hbarEndX - endsSetup2.hbarEndX;
 
       // Draw Rise difference line
-      const riseDiffX = Math.min(endsSetup1.stemEndX, endsSetup2.stemEndX);
+      const riseDiffX = Math.min(endsSetup1.hbarEndX, endsSetup2.hbarEndX);
       svg.append("line")
         .attr("x1", riseDiffX)
-        .attr("y1", endsSetup1.stemEndY)
+        .attr("y1", endsSetup1.hbarEndY)
         .attr("x2", riseDiffX)
-        .attr("y2", endsSetup2.stemEndY)
+        .attr("y2", endsSetup2.hbarEndY)
         .attr("stroke", "gray")
         .attr("stroke-width", 1 );
 
       // Draw Reach difference line
-      const reachDiffY = Math.max(endsSetup1.stemEndY, endsSetup2.stemEndY);
+      const reachDiffY = Math.max(endsSetup1.hbarEndY, endsSetup2.hbarEndY);
       svg.append("line")
-        .attr("x1", endsSetup1.stemEndX)
+        .attr("x1", endsSetup1.hbarEndX)
         .attr("y1", reachDiffY)
-        .attr("x2", endsSetup2.stemEndX)
+        .attr("x2", endsSetup2.hbarEndX)
         .attr("y2", reachDiffY)
         .attr("stroke", "gray")
         .attr("stroke-width", 1);        
@@ -103,16 +115,16 @@ const BikePlot = ({ geometry }) => {
       svg.append("text")
         .attr("class", "difference-text")
         .attr("x", riseDiffX + 5) // Adjust as necessary for positioning
-        .attr("y", Math.min(endsSetup1.stemEndY, endsSetup2.stemEndY)) // Positioning from the bottom
+        .attr("y", Math.min(endsSetup1.hbarEndY, endsSetup2.hbarEndY)) // Positioning from the bottom
         .attr("fill", "gray")
-        .text(`Rise Difference = ${riseDifference.toFixed(1)} mm`);
+        .text(`Rise Difference = ${Math.abs(riseDifference.toFixed(1))} mm (${Math.abs((riseDifference / 25.4).toFixed(2))} in)`);
 
       svg.append("text")
         .attr("class", "difference-text")
-        .attr("x", Math.max(endsSetup1.stemEndX, endsSetup2.stemEndX)) // Adjust as necessary for positioning
+        .attr("x", Math.max(endsSetup1.hbarEndX, endsSetup2.hbarEndX)) // Adjust as necessary for positioning
         .attr("y", reachDiffY + 15) // A bit lower than the first text
         .attr("fill", "gray")
-        .text(`Reach Difference = ${reachDifference.toFixed(1)} mm`);
+        .text(`Reach Difference = ${Math.abs(reachDifference.toFixed(1))} mm (${Math.abs((reachDifference / 25.4).toFixed(2))} in)`);
       
     }
   }, [geometry]); // Redraw when geometry changes
