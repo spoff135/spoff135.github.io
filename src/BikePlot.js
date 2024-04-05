@@ -117,14 +117,14 @@ const BikePlot = ({ geometry }) => {
         .attr("x", riseDiffX + 5) // Adjust as necessary for positioning
         .attr("y", Math.min(endsSetup1.hbarEndY, endsSetup2.hbarEndY)) // Positioning from the bottom
         .attr("fill", "gray")
-        .text(`Rise Difference = ${Math.abs(riseDifference.toFixed(1))} mm (${Math.abs((riseDifference / 25.4).toFixed(2))} in)`);
+        .text(`Rise Difference = ${Math.abs(riseDifference.toFixed(0))} mm (${Math.abs((riseDifference / 25.4).toFixed(1))} in)`);
 
       svg.append("text")
         .attr("class", "difference-text")
         .attr("x", Math.max(endsSetup1.hbarEndX, endsSetup2.hbarEndX)) // Adjust as necessary for positioning
         .attr("y", reachDiffY + 15) // A bit lower than the first text
         .attr("fill", "gray")
-        .text(`Reach Difference = ${Math.abs(reachDifference.toFixed(1))} mm (${Math.abs((reachDifference / 25.4).toFixed(2))} in)`);
+        .text(`Reach Difference = ${Math.abs(reachDifference.toFixed(0))} mm (${Math.abs((reachDifference / 25.4).toFixed(1))} in)`);
       
     }
   }, [geometry]); // Redraw when geometry changes
